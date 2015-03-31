@@ -1,7 +1,8 @@
 {
+  "author": "Jafar Husain <jhusain@gmail.com>",
   "name": "task-lib",
   "version": "0.0.1",
-  "description": "Cancellable Tasks with API similar to Promises. Easily re-factor Promise code to use Tasks when you find out that you need cancellation semantics.",
+  "description": "Tasks with API similar to Promises. Unlike Promises, you can stop observing Tasks. Once a task is no longer being observed, it can cancel underlying actions like async requests.",
   "scripts": {
     "prepublish": "gulp"
   },
@@ -17,7 +18,8 @@
     "url": "https://github.com/jhusain/task-lib.git"
   },
   "dependencies": {
-    "asap": "^2.0.1"
+    "asap": "^2.0.1",
+    "promise": "^6.1.0"
   },
   "devDependencies": {
     "browserify": "^9.0.3",

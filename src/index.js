@@ -1,3 +1,4 @@
+var Promise = require('promise');
 var noop = function() {};
 var identity = function(v) { return v; };
 var noopSubscription = Object.seal({ dispose: () => {} });
