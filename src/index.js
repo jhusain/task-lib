@@ -92,7 +92,7 @@ class Task {
 
     when(projection) {
         var self = this;
-        return new Task(function(resolve) {
+        return new Task(function(resolve, reject) {
             var subscription = 
                 self.get(
                     x => {
