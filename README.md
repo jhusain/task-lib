@@ -4,7 +4,7 @@ Promises are currently very popular in the JavaScript world. ES2015 includes nat
 
 Promise are too simple for most asynchronous APIs in user interfaces, and that creates considerable incidental complexity. Developers and library authors want to use Promises because they are part of the web platform and well-understood. However these developers often find themselves clumsily exposing cancellation APIs alongside Promise-returning APIs and relying on error handling to manage normal program control flow.
 
-**Rather than try and use Promises to model asynchronous APIs which require cancellation, why not use a more appropriate abstraction that is equally composable?"**
+**Rather than try and use Promises to model asynchronous APIs which require cancellation, why not use a more appropriate abstraction?"**
 
 ## Introducing Task
 A Task models an asynchronous unit of work which will eventually result to a value. Tasks can be composed in exactly the same manner as Promises, but a Task can optionally cancel any scheduled asynchronous actions in the event that all of its consumers stop observing its eventual value.
