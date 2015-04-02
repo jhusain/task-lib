@@ -1,4 +1,4 @@
-# Task Library for JavaScript
+# JavaScript Tasks
 
 Promises are currently very popular in the JavaScript world. ES2015 includes native Promises and uses them for module resolution.  Standards bodies and library authors are increasingly using Promises because they are there, and are more easily composed then callback API. Unfortunately _Promises are too primitive for many asynchronous APIs_, because Promises do not expose an API to cancel the asynchronous actions which have been initiated to resolve them.  
 
