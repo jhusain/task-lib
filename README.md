@@ -107,10 +107,10 @@ Tasks are designed to be easy to drop-in as a replacement for Promises. In the e
 
 Tasks share the following attributes with Promises:
 
-* Auto-flattening (`when` can return T or Task<T>)
+* Auto-flattening (`when` function can return T or Task<T>)
 * Result broadcasted to all listeners
 * Result cached for future consumers
-* All Handlers always fire asychronously (Zalgo not released)
+* Handlers always fire asychronously (Zalgo not released)
 * Equivalent implementation (where possible) of all ES2015 (JavaScript vNext) Promise methods
 * Can be composed together using ES2015 generators! (yield)
 
