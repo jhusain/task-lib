@@ -1,4 +1,3 @@
-var Promise = require('promise');
 var noop = function() {};
 var identity = function(v) { return v; };
 var noopSubscription = Object.seal({ dispose: () => {} });
@@ -90,7 +89,7 @@ class Task {
         }
     }
 
-    when(projection) {
+    when(projection, onerror) {
         var self = this;
         return new Task(function(resolve, reject) {
             var subscription = 
@@ -98,10 +97,10 @@ class Task {
                     x => {
                         try {
                             var nextTask = Task.resolve(projection(x));
-                            subscription = nextTask.run(resolve, reject);
+                            subscription = nextTask.run(resolve, onerror || reject);
                         }
                         catch(e) {
-                            reject(e);
+                            onerror && onerror(e) || reject(e);
                         }
                     },
                     reject);
@@ -117,10 +116,9 @@ class Task {
         });
     }
 
-    toPromise() {
-        return new Promise((resolve, reject) => {            
-            this.run(resolve, reject);
-        });
+    then(resolve, reject) {
+        this.run(resolve, reject);
+        return this;
     }
 }
 
@@ -186,11 +184,12 @@ Task.race = function(args) {
 };
 
 Task.resolve = function(v) {
+    var task;
     if (v instanceof Task) {
         return v;
     }
     else if (v !== null && v.then) {
-        return new Task((resolve, reject) => {
+        task = new Task((resolve, reject) => {
             var observing = true;
             v.then(
                 v => {
@@ -202,6 +201,11 @@ Task.resolve = function(v) {
 
             return { dispose:() => { observing = false; }};
         });
+        
+        // have to run the task immediately, which means it can never be cancelled
+        task.run();
+
+        return task;
     }
     else {
         return new Task((resolve, reject) => {
