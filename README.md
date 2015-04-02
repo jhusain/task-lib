@@ -29,7 +29,7 @@ var customerModelPromise =
       error => console.error('Something went wrong.'));
 ```
 
-Here's the equivalent example using a Task. Note the difference is that a Task must be explicitly run in order to kick off the network request.
+Here's the equivalent example using a Task. Note the only difference (beyond using `when` instead of `then`) is that a Task must be explicitly run in order to kick off the network request.
 
 ```JavaScript
 let customerModelTask = 
