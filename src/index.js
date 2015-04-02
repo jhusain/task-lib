@@ -5,8 +5,8 @@ var noopSubscription = Object.seal({ dispose: () => {} });
 var asap = require('asap');
 
 class Task {
-    constructor(get) {
-        this._get = get;
+    constructor(run) {
+        this._run = run;
         this._observers = Object.create(null);
         this._uuid = 0;
         this._length = 0;
@@ -36,7 +36,7 @@ class Task {
         return subscription;
     }
 
-    get(resolveFn = noop, rejectFn = noop) {
+    run(resolveFn = noop, rejectFn = noop) {
         var self = this,
             id = this._uuid,
             observing = true;
@@ -58,7 +58,7 @@ class Task {
             asap(() => {
                 if (observing) {
                     this._subscription = 
-                        this._get(
+                        this._run(
                             value => {
                                 this.value = value;
                                 Object.
@@ -94,11 +94,11 @@ class Task {
         var self = this;
         return new Task(function(resolve, reject) {
             var subscription = 
-                self.get(
+                self.run(
                     x => {
                         try {
                             var nextTask = Task.resolve(projection(x));
-                            subscription = nextTask.get(resolve, reject);
+                            subscription = nextTask.run(resolve, reject);
                         }
                         catch(e) {
                             reject(e);
@@ -119,7 +119,7 @@ class Task {
 
     toPromise() {
         return new Promise((resolve, reject) => {            
-            this.get(resolve, reject);
+            this.run(resolve, reject);
         });
     }
 }
@@ -132,7 +132,7 @@ Task.all = function(args) {
             resultCount = 0,
             subscriptions = 
                 tasks.map((task, index) => 
-                    task.get(
+                    task.run(
                         val => {
                             results[index] = val;
                             resultCount++;
@@ -164,7 +164,7 @@ Task.race = function(args) {
             resultCount = 0,
             subscriptions = 
                 tasks.map((task, index) => 
-                    task.get(
+                    task.run(
                         val => {
                             resolve(val);
                             subscription.dispose();
@@ -217,7 +217,7 @@ Task.reject = function(e) {
 };
 
 Task.timeout = function(time) {
-    return new Task(function get(resolve, reject) {
+    return new Task(function run(resolve, reject) {
         var handle = setTimeout(function() { resolve(); }, time);
 
         return { 
