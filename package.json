@@ -1,7 +1,7 @@
 {
   "author": "Jafar Husain <jhusain@gmail.com>",
   "name": "task-lib",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Tasks with API similar to Promises. Unlike Promises, you can stop observing Tasks. Once a task is no longer being observed, it can cancel underlying actions like async requests.",
   "scripts": {
     "prepublish": "gulp"
@@ -18,12 +18,15 @@
     "url": "https://github.com/jhusain/task-lib.git"
   },
   "dependencies": {
-    "asap": "^2.0.1",
-    "promise": "^6.1.0"
+    "asap": "^2.0.1"
   },
   "devDependencies": {
     "browserify": "^9.0.3",
     "gulp": "~3.8.8",
     "gulp-babel": "^4.0.1"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/jhusain/task-lib/issues"
+  },
+  "homepage": "https://github.com/jhusain/task-lib"
 }
