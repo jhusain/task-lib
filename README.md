@@ -1,5 +1,84 @@
 # JavaScript Tasks
 
+A Task models an asynchronous unit of work which will eventually resolve with a value or reject with an error. When a Task is run, it returns a Subscription object which the consumer can use to stop observing the tasks result. Once a Task detects that its result is no longer being observed by any consumers, it can opportunistically **cancel** any actions scheduled to resolve its value.
+
+Here's an example of a program which waits for a user to click a button and then issues a network request to retrieve a stock quote. If the button is clicked again while the network request is still pending, the current network request is aborted and a new one is issued. 
+
+```JavaScript
+// variable that stores the Subscription to the current stock price network request
+var outgoingRequest;
+function waitForQuote() {
+  // if there's a request in-flight, cancel it
+  if (outgoingRequest) {
+    outgoingRequest.dispose();
+    outgoingRequest = undefined;
+  }
+  
+  outgoingRequest = 
+    Task.
+      // wait for next button click...
+  		nextEvent(getQuoteButton, 'click').
+  		// return a task with the stock quote and auto-unwrap result just like Promise's then
+      when(function() { 
+        return getQuote('NFLX');
+      }).
+			// run and await the result  		
+      run(function(val) { 
+        // display the price
+        priceTextBox.value = val;
+        outgoingRequest = undefined;
+        
+        waitForQuote();
+      });
+}
+
+waitForQuote();
+```
+
+Here is the definition of the getQuote function, which returns a Task which will issue a network request for a stock quote. Unlike a Promise, the Task can **cancel** the outgoing network request if the result is no longer being observed.
+
+```JavaScript
+var Task = require('task-lib');
+
+function getQuote(symbol) {
+  return new Task((resolve, reject) => {
+    var xhr = new XMLHttpRequest(),
+      url = 'https://query.yahooapis.com/v1/public/yql?q=select%20LastTradePriceOnly%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%22' + symbol + '%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';
+    
+    xhr.open('get', url, true);
+    xhr.onreadystatechange = function() {
+      var status;
+      var data;
+      // https://xhr.spec.whatwg.org/#dom-xmlhttprequest-readystate
+      if (xhr.readyState == 4) { // `DONE`
+        status = xhr.status;
+        if (status == 200) {
+          data = JSON.parse(xhr.responseText).query.results.quote.LastTradePriceOnly;
+          resolve(data);
+        } else {
+          reject(status);
+        }
+      }
+    };
+    
+    xhr.send();
+    
+    // the cancellation action to perform when the Task is no longer observed.
+    return { dispose: () => xhr.abort() };
+  });
+}
+```
+
+Try this example live now! http://requirebin.com/?gist=533ad1e9d573ea7e9c5e
+
+## Installing the JavaScript Task Library
+
+```
+npm install task-lib
+```
+
+## Why not Promises?
+
 Promises are currently very popular in the JavaScript world. ES2015 (JavaScript vNext) includes native Promises and uses them for module resolution. Standards bodies and library authors are increasingly using Promises because they are now part of the web platform, and are more composable than callback APIs. Unfortunately the standardization of Promises has created a hazard: standards bodies and library authors are using Promises instead of more appropriate abstractions, simply *because they are standardized.* The new fetch API is only the latest example (https://github.com/whatwg/fetch/issues/27).
 
 **Promises do not expose a cancellation semantic, and most asynchronous operations in user-interfaces need to be cancelled.** It is very common for UIs to listen for an event, follow an event with an asynchronous request, and finish with an animation. If a user suddenly chooses to close a form, event handlers often need to be removed, enqueued network requests will ideally be aborted, and in-flight animations will ideally be interrupted. If a library author has chosen to expose abstract these operations as promises, their options for cancellation are limited and unnattractive. To enable cancellation, library authors often resort to adding sibling cancellation APIs alongside promise-returning APIs. The cancellation API is not on the promise, which means it needs to be passed alongside the Promise to any consumer that needs the ability to cancel. This complicates method signatures and introduces additional coupling. Furthermore in the event of cancellation, the only way to cause Promises to release attached callbacks is to **reject the promise.** This effectively forces developers to use error handling for program flow in common and expected situations. Such situations include a user closing a form mid-animation, or a user typing another character into an autocomplete box while a network request for the old search is in-flight.
