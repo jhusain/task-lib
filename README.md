@@ -1,6 +1,6 @@
 # JavaScript Tasks
 
-A Task models an asynchronous unit of work which will eventually resolve with a value or reject with an error. When a Task is run, it returns a Subscription object which the consumer can use to stop observing the Task's result. Once a Task detects that its result is no longer being observed by any consumers, it can opportunistically **cancel** any actions scheduled to resolve its value.
+A Task models an asynchronous unit of work which will eventually resolve with a value or reject with an error. When a Task is run, it returns a Subscription object which the consumer can use to stop observing the Task's result. Once a Task detects that its result is no longer being observed by any consumers, the Task can opportunistically **cancel** any actions scheduled to resolve its value.
 
 Here's an example of a program which waits for a user to click a button and then issues a network request to retrieve a stock quote. If the button is clicked again while the network request is still pending, the current network request is aborted and a new one is issued. 
 
@@ -35,7 +35,7 @@ function waitForQuote() {
 waitForQuote();
 ```
 
-Here is the definition of the getQuote function. This function returns a Task which issues a network request for a stock quote when run. Unlike a Promise, a consumer can stop observing a Task. The Task may also **cancel** the outgoing network request if its result is no longer being observed.
+Here is the definition of the getQuote function. This function returns a Task which issues a network request for a stock quote when run. Note that when a Task is created it returns a cancellation action to execute once all consumers have stopped observing its result.
 
 ```JavaScript
 var Task = require('task-lib');
