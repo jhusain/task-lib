@@ -17,12 +17,12 @@ function waitForQuote() {
   outgoingRequest = 
     Task.
       // wait for next button click...
-  		nextEvent(getQuoteButton, 'click').
-  		// return a task with the stock quote and auto-unwrap result just like Promise's then
+  	nextEvent(getQuoteButton, 'click').
+      // return a task with the stock quote and auto-unwrap result just like Promise's then
       when(function() { 
         return getQuote('NFLX');
       }).
-			// run and await the result  		
+      // run and await the result  		
       run(function(val) { 
         // display the price
         priceTextBox.value = val;
@@ -180,7 +180,7 @@ form.addEventListener('close' function handler(e) {
 });
 ```
 
-## Like Promises, but Richer
+## Like Promises, but more Powerful
 
 Tasks are designed to be easy to drop-in as a replacement for Promises. In the event that you discover that you need cancellation semantics, you may be able to easily refactor your code to use Tasks instead of Promises.
 
@@ -237,6 +237,16 @@ form.addEventListener('close' function handler(e) {
   form.removeEventListener('close', handler);
 });
 ```
+
+In addition to Promises, you can adapt other async APIs to Tasks, such as DOM events. In this example we create a Task that resolves when the window loads:
+
+```JavaScript
+var load = Task.nextEvent(window, 'load');
+
+var subscription = load.run(() => alert('we've loaded');
+// we can unhook the event handler by calling subscription.dispose() before load fires.
+```
+
 ## The Start of a Conversation
 
 **This library is currently nowhere near mature enough for production use.** It is intended to demonstrate that richer asynchronous primitives than Promises exist, and are a better fit for many of the web's APIs.  I'm deeply concerned the convenience brought about by Promise standardization will lead to the proliferation of Promises at the expense of more appropriate asynchronous primitives. It's not that Promises are _never useful_. They are appropriate for async operations that cannot meaningfully be cancelled. However this describes a very small set of async operations used in user interfaces. We need to standardize richer asynchronous primitives so that library authors and web standards bodies can choose the most appropriate type for their APIs, not just the most convenient.
