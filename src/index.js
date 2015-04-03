@@ -89,6 +89,10 @@ class Task {
         }
     }
 
+    ['catch'](onerror) {
+        return this.when(identity, onerror);
+    }
+
     when(projection, onerror) {
         var self = this;
         return new Task(function(resolve, reject) {
@@ -229,6 +233,36 @@ Task.timeout = function(time) {
                 clearTimeout(handle);
             }
         };
+    });
+};
+
+Task.nextEvent = function(element, eventName, useCapture = false, syncHandler = noop) {
+    return new Task(function run(resolve) {
+        element.addEventListener(
+            function handler(e) { 
+                syncHandler(e);
+                resolve(e); 
+            }, 
+            useCapture);
+
+        return { 
+            dispose: function() {
+                element.removeEventListener(handler);
+            }
+        };
+    });
+};
+
+Task.fnFromNodeCallback = function(fn) {
+    return new Task(function run(resolve, reject) {
+        fn((error, data) => {
+            if (error) {
+                reject(error);
+            }
+            else {
+                resolve(data);
+            }
+        });
     });
 };
  
