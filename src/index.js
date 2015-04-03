@@ -239,6 +239,7 @@ Task.timeout = function(time) {
 Task.nextEvent = function(element, eventName, useCapture = false, syncHandler = noop) {
     return new Task(function run(resolve) {
         element.addEventListener(
+            eventName,
             function handler(e) { 
                 syncHandler(e);
                 resolve(e); 
@@ -247,7 +248,7 @@ Task.nextEvent = function(element, eventName, useCapture = false, syncHandler = 
 
         return { 
             dispose: function() {
-                element.removeEventListener(handler);
+                element.removeEventListener(eventName, handler);
             }
         };
     });
