@@ -87,8 +87,6 @@ Promises are currently very popular in the JavaScript world. ES2015 (JavaScript 
 
 ## Introducing Task
 
-A Task models an asynchronous unit of work which will eventually resolve with a value or reject with an error. In contrast, a Promise only models the eventual result of an asynchronous unit of work, not the work itself. That is why Tasks can be cancelled, and Promises can _not_.
-
 **Tasks are a more appropriate abstraction than Promises for most asynchronous APIs in user-interfaces.** You can use a Task to represent the next occurrence of an event, a network request, or an animation. A Task will make a best effort to clean up after itself as soon as all of its consumers stop observing its completion. When no longer observed, a Task can unhook an event handler, abort a network request, or stop an animation in-flight.
 
 Tasks can be composed in exactly the same way as Promises, but a Task can optionally cancel any scheduled asynchronous actions in the event that all of its observers stop observing its completion. Tasks have _nearly the same API as Promises_, with two important differences: 
