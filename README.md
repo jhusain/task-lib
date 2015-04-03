@@ -1,6 +1,6 @@
 # JavaScript Tasks
 
-A Task models an asynchronous unit of work which will eventually resolve with a value or reject with an error. When a Task is run, it returns a Subscription object which the consumer can use to stop observing the tasks result. Once a Task detects that its result is no longer being observed by any consumers, it can opportunistically **cancel** any actions scheduled to resolve its value.
+A Task models an asynchronous unit of work which will eventually resolve with a value or reject with an error. When a Task is run, it returns a Subscription object which the consumer can use to stop observing the Task's result. Once a Task detects that its result is no longer being observed by any consumers, it can opportunistically **cancel** any actions scheduled to resolve its value.
 
 Here's an example of a program which waits for a user to click a button and then issues a network request to retrieve a stock quote. If the button is clicked again while the network request is still pending, the current network request is aborted and a new one is issued. 
 
@@ -8,7 +8,7 @@ Here's an example of a program which waits for a user to click a button and then
 // variable that stores the Subscription to the current stock price network request
 var outgoingRequest;
 function waitForQuote() {
-  // if there's a request in-flight, cancel it
+  // if there's a request in-flight, stop observing the result
   if (outgoingRequest) {
     outgoingRequest.dispose();
     outgoingRequest = undefined;
@@ -35,7 +35,7 @@ function waitForQuote() {
 waitForQuote();
 ```
 
-Here is the definition of the getQuote function, which returns a Task which will issue a network request for a stock quote. Unlike a Promise, the Task can **cancel** the outgoing network request if the result is no longer being observed.
+Here is the definition of the getQuote function. This function returns a Task which issues a network request for a stock quote when run. Unlike a Promise, a consumer can stop observing a Task. The Task may also **cancel** the outgoing network request if its result is no longer being observed.
 
 ```JavaScript
 var Task = require('task-lib');
